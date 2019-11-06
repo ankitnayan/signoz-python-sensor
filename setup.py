@@ -14,7 +14,7 @@ setup(
         'signoz':  ['string = signoz:load'],
     },
     # *strongly* suggested for sharing
-    version='0.1',
+    version='0.2',
     # The license can be anything you like
     license='MIT',
     description='An example of a python package from pre-existing code',
