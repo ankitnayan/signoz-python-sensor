@@ -9,7 +9,7 @@ setup(
     # Needed to actually package something
     packages=find_packages(),
     # Needed for dependencies
-    install_requires=['autowrapt>=1.0'],
+    install_requires=['autowrapt>=1.0', 'datadog==0.29.3'],
     entry_points={
         'signoz':  ['string = signoz:load'],
     },
