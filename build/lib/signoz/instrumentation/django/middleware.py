@@ -1,7 +1,10 @@
 from __future__ import absolute_import
 
-import sys
+import sys, os
 import wrapt
+import django
+import time
+from datadog import DogStatsd
 
 
 DJ_SIGNOZ_MIDDLEWARE = 'signoz.instrumentation.django.middleware.SignozMiddleware'
@@ -11,6 +14,10 @@ try:
 except ImportError:
     MiddlewareMixin = object
 
+statsd = DogStatsd(host=os.environ['NODE_IP'], port=9125)
+
+REQUEST_LATENCY_METRIC_NAME = 'django_request_latency_seconds'
+REQUEST_COUNT_METRIC_NAME = 'django_request_count'
 
 class SignozMiddleware(MiddlewareMixin):
     """ Django Middleware to provide Application Metrics for Signoz """
@@ -19,6 +26,30 @@ class SignozMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         print ("Processing Request")
+        request.start_time = time.time()
+
+    def process_response(self, request, response):
+        print ("Processing Response")
+        statsd.increment("response_count")
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'service:django_sample_project', 
+                'method:%s' % request.method, 
+                'endpoint:%s' % request.path,
+                'status:%s' % str(response.status_code)
+                ]
+        )
+
+        resp_time = (time.time() - request.start_time)*1000
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                resp_time,
+                tags=[
+                    'service:django_sample_project',
+                    'endpoint:%s' % request.path,
+                    ]
+        )
+        return response
 
 
 def load_middleware_wrapper(wrapped, instance, args, kwargs):
