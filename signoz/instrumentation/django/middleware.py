@@ -29,7 +29,8 @@ class SignozMiddleware(MiddlewareMixin):
         request.start_time = time.time()
 
     def process_response(self, request, response):
-        
+        print ("Processing Response")
+        statsd.increment("response_count")
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'service:django_sample_project', 
