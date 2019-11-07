@@ -25,15 +25,12 @@ class SignozMiddleware(MiddlewareMixin):
         self.get_response = get_response
 
     def process_request(self, request):
-        print ("Processing Request")
         request.start_time = time.time()
 
     def process_response(self, request, response):
-        print ("Processing Response")
-        statsd.increment("response_count")
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
-                'service:django_sample_project', 
+                'service:django-test-project', 
                 'method:%s' % request.method, 
                 'endpoint:%s' % request.path,
                 'status:%s' % str(response.status_code)
@@ -75,13 +72,17 @@ def load_middleware_wrapper(wrapped, instance, args, kwargs):
     return wrapped(*args, **kwargs)
 
 
-if 'django' in sys.modules:
-    print ("Instrumenting django")
-    wrapt.wrap_function_wrapper('django.core.handlers.base', 'BaseHandler.load_middleware', load_middleware_wrapper)
+try:
+    if 'django' in sys.modules:
+        print ("Instrumenting django")
+        wrapt.wrap_function_wrapper('django.core.handlers.base', 'BaseHandler.load_middleware', load_middleware_wrapper)
 
-    # if 'INSTANA_MAGIC' in os.environ:
-    #     # If we are instrumenting via AutoTrace (in an already running process), then the
-    #     # WSGI middleware has to be live reloaded.
-    #     from django.core.servers.basehttp import get_internal_wsgi_application
-    #     wsgiapp = get_internal_wsgi_application()
-    #     wsgiapp.load_middleware()
+        # if 'INSTANA_MAGIC' in os.environ:
+        #     # If we are instrumenting via AutoTrace (in an already running process), then the
+        #     # WSGI middleware has to be live reloaded.
+        #     from django.core.servers.basehttp import get_internal_wsgi_application
+        #     wsgiapp = get_internal_wsgi_application()
+        #     wsgiapp.load_middleware()
+
+except Exception:
+    pass

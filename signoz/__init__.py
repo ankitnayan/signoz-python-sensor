@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 
 def load(module):
-    print("hello world!")
+    print("Inside Load Module!")
 
 def boot_agent():
-    print ("Inside boot agent")
+    print ("Inside Boot Agent!")
+
     from .instrumentation.django import middleware
-    print ("Django middleware imported")
+    from .instrumentation import flask
+
 
     
 boot_agent()
