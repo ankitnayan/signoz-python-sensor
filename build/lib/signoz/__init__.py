@@ -6,9 +6,12 @@ def load(module):
 def boot_agent():
     print ("Inside Boot Agent!")
 
-    from .instrumentation.django import middleware
-    from .instrumentation import flask
+    try:
+        from .instrumentation.django import middleware
+    except:
+        pass
 
+    from .instrumentation import flask
 
     
 boot_agent()
