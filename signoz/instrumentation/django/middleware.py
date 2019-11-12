@@ -30,7 +30,9 @@ class SignozMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
-                'service:django-test-project', 
+                'service:django-test-project',
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
                 'endpoint:%s' % request.path,
                 'status:%s' % str(response.status_code)
