@@ -16,11 +16,11 @@ def before_request_with_signoz(*argv, **kwargs):
 
 def after_request_with_signoz(response):
 
-    resp_time = time.time() - request.start_time
-
     statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
-                'service:flask-test-project', 
+                'service:flask-test-project',
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
                 'endpoint:%s' % request.path,
                 'status:%s' % str(response.status_code)

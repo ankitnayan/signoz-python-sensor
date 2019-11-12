@@ -16,8 +16,6 @@ def request_started_with_signoz(sender, **extra):
 
 def request_finished_with_signoz(sender, response, **extra):
 
-    resp_time = time.time() - request.start_time
-
     statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'service:flask-test-project', 
