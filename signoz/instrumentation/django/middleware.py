@@ -32,7 +32,7 @@ class SignozMiddleware(MiddlewareMixin):
             tags=[
                 'service:django-test-project',
                 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name%s' % os.environ['POD_NAME'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
                 'endpoint:%s' % request.path,
                 'status:%s' % str(response.status_code)
