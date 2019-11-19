@@ -1,5 +1,4 @@
 
-
 try:
     import flask
     from flask.signals import signals_available
@@ -9,7 +8,7 @@ try:
     #
     # Blinker support is preferred but we do the best we can when it's not available.
     #
-    print ("Instrumenting Flask!")
+    # print ("Instrumenting Flask!")
     if signals_available is True:
         import signoz.instrumentation.flask.with_blinker
     else:

@@ -4,8 +4,9 @@ import sys, os
 import wrapt
 import django
 import time
-from datadog import DogStatsd
 
+from signoz import Singleton
+statsd = Singleton.getStatsd()
 
 DJ_SIGNOZ_MIDDLEWARE = 'signoz.instrumentation.django.middleware.SignozMiddleware'
 
@@ -14,7 +15,7 @@ try:
 except ImportError:
     MiddlewareMixin = object
 
-statsd = DogStatsd(host=os.environ['NODE_IP'], port=9125)
+
 
 REQUEST_LATENCY_METRIC_NAME = 'django_request_latency_seconds'
 REQUEST_COUNT_METRIC_NAME = 'django_request_count'
