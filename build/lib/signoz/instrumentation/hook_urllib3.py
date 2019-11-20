@@ -57,7 +57,7 @@ try:
                 'app_name:%s' % os.environ['APP_NAME'],
                 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
-                'address:%s' % (kvs['host'] + ":" + kvs['port']), 
+                'address:%s' % (kvs['host'] + ":" + str(kvs['port'])), 
                 'endpoint:%s' % kvs['path'],
                 'method:%s', kvs['mathod'],
                 'status:%s', rv.status

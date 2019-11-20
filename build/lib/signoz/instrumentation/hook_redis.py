@@ -33,7 +33,6 @@ try:
 
     def execute_command_with_signoz(wrapped, instance, args, kwargs):
 
-
         (address, db) =  get_address_n_db(instance, args, kwargs)
         command = args[0]
         # print ("Redis address: ", address)
