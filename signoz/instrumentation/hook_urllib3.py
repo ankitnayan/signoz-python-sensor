@@ -60,7 +60,7 @@ try:
                 'address:%s' % (kvs['host'] + ":" + str(kvs['port'])), 
                 'endpoint:%s' % kvs['path'],
                 'method:%s', kvs['method'],
-                'status:%s', rv.status
+                'status:%d', rv.status
                 ]
         )
 
