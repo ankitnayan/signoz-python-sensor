@@ -1,8 +1,18 @@
 from wrapt import ObjectProxy
 import pymongo
-import six, time
+import six, time, os
+
+
+from signoz import Singleton
+statsd = Singleton.getStatsd()
 
 _MongoClient = pymongo.MongoClient
+
+
+MONGO_ADDRESS = getattr(_MongoClient, 'HOST') + ":" + getattr(_MongoClient, 'PORT')
+
+REQUEST_COUNT_METRIC_NAME = "mongo_request_count"
+REQUEST_LATENCY_METRIC_NAME = 'mongo_request_latency_seconds'
 
 class Command(object):
     """ Command stores information about a pymongo network command, """
@@ -132,9 +142,9 @@ class TracedServer(ObjectProxy):
             except Exception:
                 print ('error parsing query')
 
-        print ("DB: ", cmd.db)
-        print ("Collection: ", cmd.coll)
-        print ("Tags: ", cmd.tags)
+        # print ("DB: ", cmd.db)
+        # print ("Collection: ", cmd.coll)
+        # print ("Tags: ", cmd.tags)
 
         return (cmd.db, cmd.coll, cmd.tags)
 
@@ -143,7 +153,20 @@ class TracedServer(ObjectProxy):
     # Pymongo >= 3.9
     def run_operation_with_response(self, sock_info, operation, *args, **kwargs):
 
+
         (db, collection, tags) = self._signoz_trace_operation(operation)
+
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'command:%s' % getattr(operation, 'name'), 
+                'db:%s' % db, 
+                'collection:%s' % collection,
+                'address:%s' % MONGO_ADDRESS, 
+                ]
+        )
 
         start_time = time.time()
         result = self.__wrapped__.run_operation_with_response(
@@ -152,8 +175,17 @@ class TracedServer(ObjectProxy):
                 *args,
                 **kwargs
             )
-        execution_time = (time.time() - start_time)*1000
-        print ("-> Mongo (Time Taken): ", execution_time)
+        execution_time = (time.time() - start_time) * 1000
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'command:%s' % getattr(operation, 'name'),
+                    'address:%s' % MONGO_ADDRESS,
+                    ]
+        )
+        # print ("-> Mongo (Time Taken): ", execution_time)
         # print ("Pymongo - Response: ", result)
         # print ("Pymongo - Response Address: ", result.address)
         
@@ -164,17 +196,42 @@ class TracedServer(ObjectProxy):
     # Pymongo < 3.9
     
     def send_message_with_response(self, operation, *args, **kwargs):
-        command = self._signoz_trace_operation(operation)
         
-        print ("PyMongo(<3.9) - Running Operation: ", command)
+        (db, collection, tags) = self._signoz_trace_operation(operation)
+
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'command:%s' % getattr(operation, 'name'), 
+                'db:%s' % db, 
+                'collection:%s' % collection,
+                'address:%s' % MONGO_ADDRESS, 
+                ]
+        )
+
+        start_time = time.time()
+
         result = self.__wrapped__.send_message_with_response(
                 operation,
                 *args,
                 **kwargs
             )
 
-        print ("Pymongo - Response: ", result)
-        print ("Pymongo - Response Address: ", result.address)
+        execution_time = (time.time() - start_time)*1000
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'command:%s' % getattr(operation, 'name'),
+                    'address:%s' % MONGO_ADDRESS,
+                    ]
+        )
+
+        # print ("Pymongo - Response: ", result)
+        # print ("Pymongo - Response Address: ", result.address)
 
         return result
 

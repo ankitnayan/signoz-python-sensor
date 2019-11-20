@@ -7,6 +7,6 @@ try:
     if hasattr(MySQLdb, 'Connect'):
         setattr(MySQLdb, 'Connect', cf)
         
-    # print ("Instrumenting mysql-python")
+    print ("Instrumenting mysql-python")
 except ImportError:
     pass

@@ -1,7 +1,14 @@
 try:
     import wrapt
     import urllib3
-    import time
+    import time, os
+
+
+    from signoz import Singleton
+    statsd = Singleton.getStatsd()
+
+    REQUEST_COUNT_METRIC_NAME = "external_url_request_count"
+    REQUEST_LATENCY_METRIC_NAME = 'external_url_request_latency_seconds'
 
     def collect(instance, args, kwargs):
         """ Build and return a fully qualified URL for this request """
@@ -35,14 +42,36 @@ try:
             return kvs
 
     @wrapt.patch_function_wrapper('urllib3', 'HTTPConnectionPool.urlopen')
-    def urlopen_with_instana(wrapped, instance, args, kwargs):
+    def urlopen_with_signoz(wrapped, instance, args, kwargs):
 
         kvs = collect(instance, args, kwargs)
 
         start_time = time.time()
         rv = wrapped(*args, **kwargs)
-        print ("External URL: ", kvs['url'])
-        print ("-> Time External url: ", time.time() - start_time)
+        execution_time = (time.time() - start_time) * 1000
+        # print ("External URL: ", kvs['url'])
+        # print ("-> Time External url: ", execution_time)
+
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'address:%s' % (kvs['host'] + ":" + kvs['port']), 
+                'endpoint:%s' % kvs['path'],
+                'method:%s', kvs['mathod'],
+                'status:%s', rv.status
+                ]
+        )
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'endpoint:%s' % kvs['path'],
+                    ]
+        )
+
         return rv
 
     print ("Instrumenting urllib3")

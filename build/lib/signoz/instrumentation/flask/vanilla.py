@@ -18,7 +18,7 @@ def after_request_with_signoz(response):
 
     statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
-                'service:flask-test-project',
+                'app_name:%s' % os.environ['APP_NAME'],
                 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
@@ -32,7 +32,7 @@ def after_request_with_signoz(response):
     statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
             resp_time,
             tags=[
-                'service:flask-test-project',
+                'app_name:%s' % os.environ['APP_NAME'],
                 'endpoint:%s' % request.path,
                 ]
     )

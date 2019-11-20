@@ -29,9 +29,13 @@ class SignozMiddleware(MiddlewareMixin):
         request.start_time = time.time()
 
     def process_response(self, request, response):
+
+        resp_time = (time.time() - request.start_time)*1000
+
+        
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
-                'service:django-test-project',
+                'app_name:%s' % os.environ['APP_NAME'],
                 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
@@ -40,12 +44,10 @@ class SignozMiddleware(MiddlewareMixin):
                 ]
         )
 
-        resp_time = (time.time() - request.start_time)*1000
-
         statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
                 resp_time,
                 tags=[
-                    'service:django_sample_project',
+                    'app_name:%s' % os.environ['APP_NAME'],
                     'endpoint:%s' % request.path,
                     ]
         )

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import os
+import os, sys
 from datadog import DogStatsd
 
 class Singleton:
@@ -19,6 +19,7 @@ class Singleton:
          raise Exception("This class is a singleton!")
       else:
          Singleton.__statsd = DogStatsd(host=os.environ['NODE_IP'], port=9125)
+
 
 
 def load(module):

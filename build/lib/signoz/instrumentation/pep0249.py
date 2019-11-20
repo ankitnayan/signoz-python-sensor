@@ -2,7 +2,15 @@
 
 import wrapt
 import re
-import time
+import time, os
+
+from signoz import Singleton
+statsd = Singleton.getStatsd()
+
+
+REQUEST_COUNT_METRIC_NAME = "mysql_request_count"
+REQUEST_LATENCY_METRIC_NAME = 'mysql_request_latency_seconds'
+
 
 # Used by sql_sanitizer
 regexp_sql_values = re.compile('(\'[\s\S][^\']*\'|\d*\.\d+|\d+|NULL)')
@@ -15,6 +23,7 @@ def sql_sanitizer(sql):
     :return: String - A sanitized SQL statement without values.
     """
     return regexp_sql_values.sub('?', sql)
+
 
 
 class CursorWrapper(wrapt.ObjectProxy):
@@ -30,25 +39,87 @@ class CursorWrapper(wrapt.ObjectProxy):
 
 
     def execute(self, sql, params=None):
+        
+        # print ("Executing mysql query -> ", sql_sanitizer(sql))
+        query = sql_sanitizer(sql)
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'query:%s' % query, 
+
+                ]
+        )
+
         start_time = time.time()
-        print ("Executing mysql query -> ", sql_sanitizer(sql))
         result = self.__wrapped__.execute(sql, params)
-        print ("Time taken: ", 
-        time.time() - start_time)
+        execution_time = (time.time() - start_time) * 1000
+        # print ("Time taken: ", execution_time)
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'query:%s' % query,
+                    ]
+        )
+        
         return result
 
     def executemany(self, sql, seq_of_parameters):
 
-        print ("Executing mysql many ...")
+        query = 'EXECUTE_MANY'
+        # print ("Executing mysql many ...")
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'query:%s' % query, 
+
+                ]
+        )
+        start_time = time.time()
         result = self.__wrapped__.executemany(sql, seq_of_parameters)
-        print ("Returning result of many: ", result)
+        execution_time = (time.time() - start_time) * 1000
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'query:%s' % query,
+                    ]
+        )
         return result
 
     def callproc(self, proc_name, params):
         
-        print ("Calling mysql Proc")
+        # print ("Calling mysql Proc")
+        query = 'PROCEDURE'
+        statsd.increment(REQUEST_COUNT_METRIC_NAME,
+            tags=[
+                'app_name:%s' % os.environ['APP_NAME'],
+                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                'query:%s' % query, 
+
+                ]
+        )
+
+        start_time = time.time()
         result = self.__wrapped__.callproc(proc_name, params)
-        print ("CallProc mysql Result: ", result)
+        execution_time = (time.time() - start_time) * 1000
+
+        statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
+                execution_time,
+                tags=[
+                    'app_name:%s' % os.environ['APP_NAME'],
+                    'command:%s' % query,
+                    ]
+        )
+
+        # print ("CallProc mysql Result: ", result)
         return result
 
 class ConnectionWrapper(wrapt.ObjectProxy):
