@@ -62,7 +62,7 @@ try:
                 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'query:%s' % query, 
                 'address:%s' % url, 
-                'is_exception:%d' % 0
+                'is_exception:%s' % str(0)
                 ]
         )
 
@@ -72,7 +72,7 @@ try:
                 'app_name:%s' % os.environ['APP_NAME'],
                 'query:%s' % query,
                 'address:%s' % url, 
-                'is_exception:%d' % 0
+                'is_exception:%s' % str(0)
                 ]
         )
 
@@ -103,7 +103,7 @@ try:
                 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'query:%s' % query, 
                 'address:%s' % url, 
-                'is_exception:%d' % 1
+                'is_exception:%s' % str(1)
                 ]
         )
 
@@ -116,7 +116,7 @@ try:
                     'app_name:%s' % os.environ['APP_NAME'],
                     'query:%s' % query,
                     'address:%s' % url, 
-                    'is_exception:%d' % 1
+                    'is_exception:%s' % str(1)
                     ]
             )
             # print ("***** -> Error SqlAlchemy: ", str(e))
