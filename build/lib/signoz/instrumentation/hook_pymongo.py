@@ -9,7 +9,7 @@ statsd = Singleton.getStatsd()
 _MongoClient = pymongo.MongoClient
 
 
-MONGO_ADDRESS = getattr(_MongoClient, 'HOST') + ":" + getattr(_MongoClient, 'PORT')
+MONGO_ADDRESS = getattr(_MongoClient, 'HOST') + ":" + str(getattr(_MongoClient, 'PORT'))
 
 REQUEST_COUNT_METRIC_NAME = "mongo_request_count"
 REQUEST_LATENCY_METRIC_NAME = 'mongo_request_latency_seconds'
