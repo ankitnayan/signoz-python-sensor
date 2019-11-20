@@ -41,7 +41,8 @@ class CursorWrapper(wrapt.ObjectProxy):
     def execute(self, sql, params=None):
         
         # print ("Executing mysql query -> ", sql_sanitizer(sql))
-        query = sql_sanitizer(sql)
+        # query = sql_sanitizer(sql)
+        query = "SELECT"
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
