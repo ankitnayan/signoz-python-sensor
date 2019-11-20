@@ -44,7 +44,9 @@ try:
     @wrapt.patch_function_wrapper('urllib3', 'HTTPConnectionPool.urlopen')
     def urlopen_with_signoz(wrapped, instance, args, kwargs):
 
+        print ("inside urlopen")
         kvs = collect(instance, args, kwargs)
+        print("kvs collected")
 
         start_time = time.time()
         rv = wrapped(*args, **kwargs)
@@ -52,6 +54,8 @@ try:
         # print ("External URL: ", kvs['url'])
         # print ("-> Time External url: ", execution_time)
 
+        print("Before sending metrics")
+        print (kvs['port'], kvs['path'], kvs['method'])
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
