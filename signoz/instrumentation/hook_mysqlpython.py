@@ -1,6 +1,6 @@
 try:
     import MySQLdb
-    from pep0249 import ConnectionFactory
+    from .pep0249 import ConnectionFactory
     cf = ConnectionFactory(connect_func=MySQLdb.connect, module_name='mysql')
 
     setattr(MySQLdb, 'connect', cf)
