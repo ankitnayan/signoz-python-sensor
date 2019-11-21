@@ -7,8 +7,8 @@ try:
     from signoz import Singleton
     statsd = Singleton.getStatsd()
 
-    REQUEST_COUNT_METRIC_NAME = "external_url_request_count"
-    REQUEST_LATENCY_METRIC_NAME = 'external_url_request_latency_seconds'
+    REQUEST_COUNT_METRIC_NAME = "external_call_request_count"
+    REQUEST_LATENCY_METRIC_NAME = 'external_call_request_latency_seconds'
 
     def collect(instance, args, kwargs):
         """ Build and return a fully qualified URL for this request """
@@ -69,6 +69,7 @@ try:
                 tags=[
                     'app_name:%s' % os.environ['APP_NAME'],
                     'endpoint:%s' % kvs['path'],
+                    'address:%s' % (kvs['host'] + ":" + str(kvs['port'])),
                     ]
         )
 
