@@ -7,8 +7,8 @@ import time
 from signoz import Singleton
 statsd = Singleton.getStatsd()
 
-REQUEST_LATENCY_METRIC_NAME = 'flask_request_latency_seconds'
-REQUEST_COUNT_METRIC_NAME = 'flask_request_count'
+REQUEST_LATENCY_METRIC_NAME = 'application_request_latency_seconds'
+REQUEST_COUNT_METRIC_NAME = 'application_request_count'
 
 
 def request_started_with_signoz(sender, **extra):

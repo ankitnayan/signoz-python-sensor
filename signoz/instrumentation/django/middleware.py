@@ -17,8 +17,8 @@ except ImportError:
 
 
 
-REQUEST_LATENCY_METRIC_NAME = 'django_request_latency_seconds'
-REQUEST_COUNT_METRIC_NAME = 'django_request_count'
+REQUEST_LATENCY_METRIC_NAME = 'application_request_latency_seconds'
+REQUEST_COUNT_METRIC_NAME = 'application_request_count'
 
 class SignozMiddleware(MiddlewareMixin):
     """ Django Middleware to provide Application Metrics for Signoz """
