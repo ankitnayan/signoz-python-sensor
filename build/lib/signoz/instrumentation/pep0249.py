@@ -35,15 +35,15 @@ class CursorWrapper(wrapt.ObjectProxy):
         self._module_name = module_name
         self._connect_params = connect_params
         self._cursor_params = cursor_params
-        print ("Instrumenting mysql cursor")
+        # print ("Instrumenting mysql cursor")
 
 
 
     def execute(self, sql, params=None):
         
-        print ("Executing mysql query -> ", sql_sanitizer(sql))
-        # query = sql_sanitizer(sql)
-        query = "SELECT"
+        # print ("Executing mysql query -> ", sql_sanitizer(sql))
+        query = sql_sanitizer(sql)
+        # query = "SELECT"
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
@@ -57,7 +57,7 @@ class CursorWrapper(wrapt.ObjectProxy):
         start_time = time.time()
         result = self.__wrapped__.execute(sql, params)
         execution_time = (time.time() - start_time) * 1000
-        print ("Time taken: ", execution_time)
+        # print ("Time taken: ", execution_time)
 
         statsd.histogram(REQUEST_LATENCY_METRIC_NAME,
                 execution_time,

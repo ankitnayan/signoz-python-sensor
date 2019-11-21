@@ -8,6 +8,6 @@ try:
     if hasattr(pymysql, 'Connect'):
         setattr(pymysql, 'Connect', cf)
 
-    # print ("Instrumenting pymysql")
+    print ("Instrumenting pymysql")
 except ImportError:
     pass
