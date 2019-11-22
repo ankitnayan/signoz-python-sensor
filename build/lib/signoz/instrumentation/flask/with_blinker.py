@@ -3,9 +3,12 @@ import wrapt
 from flask import request, request_started, request_finished, got_request_exception
 import time
 
+from signoz.instrumentation.utils import split_endpoint
 
 from signoz import Singleton
 statsd = Singleton.getStatsd()
+
+
 
 REQUEST_LATENCY_METRIC_NAME = 'signoz_application_request_latency_seconds'
 REQUEST_COUNT_METRIC_NAME = 'signoz_application_request_count'
@@ -23,7 +26,7 @@ def request_finished_with_signoz(sender, response, **extra):
                 # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
-                'endpoint:%s' % request.path,
+                'endpoint:%s' % split_endpoint(request.path),
                 'status:%s' % str(response.status_code)
                 ]
     )
@@ -34,7 +37,7 @@ def request_finished_with_signoz(sender, response, **extra):
             resp_time,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'endpoint:%s' % request.path,
+                'endpoint:%s' % split_endpoint(request.path),
                 ]
     )
 

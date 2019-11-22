@@ -205,9 +205,9 @@ class TracedServer(ObjectProxy):
                 # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'command:%s' % getattr(operation, 'name'), 
-                # 'db:%s' % db, 
-                # 'collection:%s' % collection,
-                # 'address:%s' % MONGO_ADDRESS, 
+                'db:%s' % db, 
+                'collection:%s' % collection,
+                'address:%s' % MONGO_ADDRESS, 
                 ]
         )
 

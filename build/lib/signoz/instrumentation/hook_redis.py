@@ -44,8 +44,8 @@ try:
                 # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                 # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'command:%s' % command, 
-                # 'db:%s' % db, 
-                # 'address:%s' % address, 
+                'db:%s' % db, 
+                'address:%s' % address, 
                 ]
         )
 
@@ -59,8 +59,8 @@ try:
                 tags=[
                     'app_name:%s' % os.environ['APP_NAME'],
                     'command:%s' % command,
-                    # 'db:%s' % db, 
-                    # 'address:%s' % address,
+                    'db:%s' % db, 
+                    'address:%s' % address,
                     ]
         )
 
@@ -87,8 +87,8 @@ try:
                     # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
                     # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                     'command:%s' % command, 
-                    # 'db:%s' % str(db), 
-                    # 'address:%s' % address, 
+                    'db:%s' % str(db), 
+                    'address:%s' % address, 
                     ]
             )
 
@@ -107,8 +107,8 @@ try:
                 tags=[
                     'app_name:%s' % os.environ['APP_NAME'],
                     'command:%s' % command,
-                    # 'db:%s' % str(db), 
-                    # 'address:%s' % address,
+                    'db:%s' % str(db), 
+                    'address:%s' % address,
                     ]
         )
 
