@@ -36,8 +36,8 @@ class SignozMiddleware(MiddlewareMixin):
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'method:%s' % request.method, 
                 'endpoint:%s' % request.path,
                 'status:%s' % str(response.status_code)

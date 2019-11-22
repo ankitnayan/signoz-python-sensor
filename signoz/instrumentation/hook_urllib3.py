@@ -55,11 +55,11 @@ try:
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'address:%s' % (kvs['host'] + ":" + str(kvs['port'])), 
                 'endpoint:%s' % kvs['path'],
-                'method:%s' % kvs['method'],
+                # 'method:%s' % kvs['method'],
                 'status:%s' % str(rv.status)
                 ]
         )

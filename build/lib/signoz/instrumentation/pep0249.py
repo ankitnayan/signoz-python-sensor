@@ -42,13 +42,13 @@ class CursorWrapper(wrapt.ObjectProxy):
     def execute(self, sql, params=None):
         
         # print ("Executing mysql query -> ", sql_sanitizer(sql))
-        query = sql_sanitizer(sql)
-        # query = "SELECT"
+        # query = sql_sanitizer(sql)
+        query = "SELECT"
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'query:%s' % query, 
 
                 ]
@@ -76,8 +76,8 @@ class CursorWrapper(wrapt.ObjectProxy):
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'query:%s' % query, 
 
                 ]
@@ -102,8 +102,8 @@ class CursorWrapper(wrapt.ObjectProxy):
         statsd.increment(REQUEST_COUNT_METRIC_NAME,
             tags=[
                 'app_name:%s' % os.environ['APP_NAME'],
-                'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
-                'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
+                # 'kubernetes_namespace:%s' % os.environ['POD_NAMESPACE'],
+                # 'kubernetes_pod_name:%s' % os.environ['POD_NAME'],
                 'query:%s' % query, 
 
                 ]
